@@ -28,7 +28,11 @@ This repository is no longer design-only. The current implementation state is:
 - the dashboard and device detail viewer are working against real database data, including MapLibre rendering and Google Maps transit handoff
 - a manual API upload test has already been verified end to end: valid token returns `200`, invalid token returns `401`, and the viewer reflects the new coordinates
 - local verification has been completed: browser smoke test passed, TypeScript typecheck passed, and `next build` passed
-- the Android app is now an internal MVP uploader: it requests runtime permissions, starts a foreground service, reads the current location with `FusedLocationProviderClient`, and uploads to `/api/location` on an interval using a temporary device token configured from local build properties
+- the Android app uses native Android `LocationManager` instead of Google Play Services `FusedLocationProviderClient`, so it works on devices without GMS (e.g. HONOR, Huawei, and other Chinese market phones)
+- the Android app has been verified end-to-end on a real HONOR device (LSA-AN00): location collection, battery status, and upload to the public API all work correctly
+- the web app is deployed to Vercel and accessible at `https://location.sophia.beer/`
+- the Android app uploads to the public Vercel endpoint; the full pipeline from phone GPS to public web viewer is operational
+- source code is hosted at `https://github.com/JerryZ8889/location.git`
 
 Immediate gaps from the current repo state:
 
@@ -36,7 +40,6 @@ Immediate gaps from the current repo state:
 - no pairing token creation and consume flow is wired yet
 - no real device registration flow is wired yet
 - the Android internal MVP still depends on a temporary device token bootstrap instead of a real registration flow
-- Android command-line compilation could not be completed yet because the project currently does not include a Gradle wrapper
 - no automated tests are in place yet
 
 ## 2. Scope And Boundaries
@@ -185,7 +188,7 @@ should be considered instead of custom WebSocket infrastructure on Vercel.
 
 - Language: Kotlin
 - Minimum approach: Android native app
-- Location API: FusedLocationProviderClient
+- Location API: Android native `LocationManager` (no GMS dependency, supports Chinese market devices)
 - Local persistence: Room
 - Background orchestration: Foreground Service plus WorkManager for retry
 - Networking: Retrofit or Ktor client
@@ -1039,16 +1042,17 @@ Exit criteria:
 
 Status:
 
-- partially started
+- substantially complete
 
 - Android runtime permission request flow exists
 - Android foreground service exists
-- current-location capture through `FusedLocationProviderClient` exists
+- current-location capture through native `LocationManager` exists (replaced `FusedLocationProviderClient` to support devices without Google Play Services)
 - `POST /api/location` exists and now enforces device token authentication
 - local build configuration exists through `apps/android/local.properties`
-- still needed: real device registration, local retry queue, true on-device compile verification, and broader failure handling
+- end-to-end verified on a real HONOR device uploading to the public Vercel endpoint
+- still needed: real device registration, local retry queue, and broader failure handling
 
-Exit criteria:
+Exit criteria met:
 
 - Android app can send valid location payloads
 - backend stores them
@@ -1189,13 +1193,14 @@ If the goal is to get a solid first version shipped quickly, the recommended imp
 
 Build from the current repo state in this order:
 
-1. Run the current Android internal MVP on a real device and confirm live uploads reach the viewer
-2. Add a proper device registration flow to replace the temporary local-properties device token bootstrap
-3. Implement auth in the web app and settle the Android-compatible session strategy
-4. Implement pairing token create and consume flows plus share management actions
-5. Add viewer-side polling and stale-state UX
-6. Add upload credential hardening, rate limiting, and stronger audit coverage
-7. Add automated tests for API contracts, repository logic, and viewer flows
+1. ~~Run the current Android internal MVP on a real device and confirm live uploads reach the viewer~~ **Done** — verified on HONOR LSA-AN00, uploads reach the public Vercel endpoint and display on the web viewer
+2. Simplify the web entry: remove the dashboard device-list page (which shows paused/active status selection) and redirect the root URL directly to the active device map view — for single-device MVP there is no need for a device picker
+3. Add viewer-side auto-polling so the map updates without manual page refresh
+4. Add a proper device registration flow to replace the temporary local-properties device token bootstrap
+5. Implement auth in the web app and settle the Android-compatible session strategy
+6. Implement pairing token create and consume flows plus share management actions
+7. Add upload credential hardening, rate limiting, and stronger audit coverage
+8. Add automated tests for API contracts, repository logic, and viewer flows
 
 This order minimizes wasted work and keeps the first usable version small.
 
