@@ -1,0 +1,15 @@
+{
+  "name": "location-platform",
+  "private": true,
+  "workspaces": [
+    "apps/web",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "npm --workspace @location/web run dev",
+    "build:web": "npm --workspace @location/web run build",
+    "lint:web": "npm --workspace @location/web run lint",
+    "typecheck:web": "npm --workspace @location/web run typecheck"
+  }
+}
+

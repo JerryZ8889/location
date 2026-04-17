@@ -1,0 +1,6 @@
+## Copy the keys you need into apps/android/local.properties before running on a device.
+## For a physical phone on the same Wi-Fi, replace the base URL with your computer's LAN IP.
+location.apiBaseUrl=http://10.0.2.2:3000
+location.deviceId=demo-tokyo-android
+location.deviceToken=demo-token-tokyo
+location.uploadIntervalMs=60000

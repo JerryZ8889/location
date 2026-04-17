@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="pin" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#0b8f7b" />
+      <stop offset="100%" stop-color="#004d40" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="18" fill="#f3efe4" />
+  <path
+    d="M32 10c-10.493 0-19 8.507-19 19 0 13.554 16.169 24.959 17.521 25.899a2.75 2.75 0 0 0 2.958 0C34.831 53.959 51 42.554 51 29c0-10.493-8.507-19-19-19Z"
+    fill="url(#pin)"
+  />
+  <circle cx="32" cy="29" r="8.5" fill="#f3efe4" />
+  <circle cx="32" cy="29" r="4.25" fill="#00695c" />
+</svg>
