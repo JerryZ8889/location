@@ -90,12 +90,12 @@ export function DeviceLiveView({
     <main className="shell">
       <section className="hero">
         <Link href="/" className="muted">
-          Back to dashboard
+          Home
         </Link>
         <h1>{latest.deviceName}</h1>
         <p>
-          Current map view, latest capture details, and a direct handoff to
-          Google Maps transit directions.
+          Current map view, the exact timestamp for the location on screen, and
+          a direct handoff to Google Maps transit directions.
         </p>
       </section>
 
@@ -104,6 +104,7 @@ export function DeviceLiveView({
           <div className="meta-row detail-meta-row">
             <StatusPill status={latest.shareStatus} />
             <span>Android last received {formatDateTime(latest.lastReceivedAt)}</span>
+            <span>Current location captured {formatDateTime(location?.capturedAt ?? null)}</span>
             <span>Viewer checked {formatDateTime(viewerCheckedAt)}</span>
           </div>
           <LocationMap point={location} />
@@ -120,7 +121,7 @@ export function DeviceLiveView({
           </div>
 
           <div className="stat-block">
-            <h3>Captured At</h3>
+            <h3>Current Location Captured At</h3>
             <p>{formatDateTime(location?.capturedAt ?? null)}</p>
           </div>
 
