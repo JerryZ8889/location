@@ -101,11 +101,23 @@ export function DeviceLiveView({
 
       <section className="grid detail-grid">
         <div className="card map-card">
-          <div className="meta-row detail-meta-row">
-            <StatusPill status={latest.shareStatus} />
-            <span>Android last received {formatDateTime(latest.lastReceivedAt)}</span>
-            <span>Current location captured {formatDateTime(location?.capturedAt ?? null)}</span>
-            <span>Viewer checked {formatDateTime(viewerCheckedAt)}</span>
+          <div className="map-toolbar">
+            <div className="meta-row detail-meta-row">
+              <StatusPill status={latest.shareStatus} />
+              <span>Android last received {formatDateTime(latest.lastReceivedAt)}</span>
+              <span>Current location captured {formatDateTime(location?.capturedAt ?? null)}</span>
+              <span>Viewer checked {formatDateTime(viewerCheckedAt)}</span>
+            </div>
+            <button
+              type="button"
+              className="button button-primary button-compact map-refresh-button"
+              disabled={isRefreshing}
+              onClick={() => {
+                void refreshLatest();
+              }}
+            >
+              {isRefreshing ? "Refreshing..." : "Refresh"}
+            </button>
           </div>
           <LocationMap point={location} />
         </div>
@@ -154,19 +166,6 @@ export function DeviceLiveView({
             <p>
               {refreshError ?? "Click Refresh Now to query the latest server data."}
             </p>
-          </div>
-
-          <div className="button-row">
-            <button
-              type="button"
-              className="button button-primary"
-              disabled={isRefreshing}
-              onClick={() => {
-                void refreshLatest();
-              }}
-            >
-              {isRefreshing ? "Refreshing..." : "Refresh Now"}
-            </button>
           </div>
 
           <div className="button-row">

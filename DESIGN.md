@@ -26,6 +26,7 @@ This repository is no longer design-only. The current implementation state is:
 - currently implemented web/API routes are `GET /api/health`, `GET /api/devices`, `GET /api/devices/{deviceId}/latest`, `GET /api/devices/{deviceId}/history`, and `POST /api/location`
 - `POST /api/location` now enforces device upload authentication through the `X-Device-Token` header and the device record in `location.devices`
 - the dashboard and device detail viewer are working against real database data, including MapLibre rendering and Google Maps transit handoff
+- the web root now redirects directly to the active Tokyo demo device view, and the viewer uses a manual refresh action rather than auto-polling
 - a manual API upload test has already been verified end to end: valid token returns `200`, invalid token returns `401`, and the viewer reflects the new coordinates
 - local verification has been completed: browser smoke test passed, TypeScript typecheck passed, and `next build` passed
 - the Android app uses native Android `LocationManager` instead of Google Play Services `FusedLocationProviderClient`, so it works on devices without GMS (e.g. HONOR, Huawei, and other Chinese market phones)
@@ -40,6 +41,7 @@ Immediate gaps from the current repo state:
 - no pairing token creation and consume flow is wired yet
 - no real device registration flow is wired yet
 - the Android internal MVP still depends on a temporary device token bootstrap instead of a real registration flow
+- `Latest Android Update` is not refreshing reliably in the deployed viewer, which indicates continuous Android upload behavior still needs hardening
 - no automated tests are in place yet
 
 ## 2. Scope And Boundaries
@@ -136,7 +138,7 @@ For MVP, do not build full WebSocket real-time.
 Use:
 
 - Android upload interval: around every 30 to 60 seconds while actively sharing
-- Viewer refresh interval: poll the latest location every 10 to 15 seconds
+- Viewer refresh: manual refresh button in the current deployed build, with optional polling reconsidered later if truly needed
 
 Why:
 
@@ -1154,7 +1156,7 @@ Main cost drivers:
 ### 19.3 Cost Control
 
 - limit history retention
-- poll viewer page every 10 to 15 seconds, not every second
+- prefer explicit manual refresh in the viewer unless there is a strong need for automatic polling
 - store latest location separately for fast reads
 - avoid reverse geocoding every write unless necessary
 
@@ -1195,7 +1197,7 @@ Build from the current repo state in this order:
 
 1. ~~Run the current Android internal MVP on a real device and confirm live uploads reach the viewer~~ **Done** — verified on HONOR LSA-AN00, uploads reach the public Vercel endpoint and display on the web viewer
 2. Simplify the web entry: remove the dashboard device-list page (which shows paused/active status selection) and redirect the root URL directly to the active device map view — for single-device MVP there is no need for a device picker
-3. Add viewer-side auto-polling so the map updates without manual page refresh
+3. Fix the `Latest Android Update` staleness issue by making continuous Android uploads reliable while the app is backgrounded and unplugged
 4. Add a proper device registration flow to replace the temporary local-properties device token bootstrap
 5. Implement auth in the web app and settle the Android-compatible session strategy
 6. Implement pairing token create and consume flows plus share management actions
